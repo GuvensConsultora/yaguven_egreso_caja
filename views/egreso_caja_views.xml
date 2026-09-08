@@ -81,8 +81,7 @@
                 <filter name="filtro_confirmado" string="Confirmados" domain="[('state', '=', 'posted')]"/>
                 <filter name="filtro_anulado" string="Anulados" domain="[('state', '=', 'cancel')]"/>
                 <separator/>
-                <filter name="filtro_este_mes" string="Este mes"
-                        domain="[('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filtro_fecha" string="Fecha" date="date"/>
                 <group expand="0" string="Agrupar por">
                     <filter name="agrupar_cuenta" string="Cuenta" context="{'group_by': 'account_id'}"/>
                     <filter name="agrupar_estado" string="Estado" context="{'group_by': 'state'}"/>
@@ -96,7 +95,6 @@
         <field name="name">Egresos de caja</field>
         <field name="res_model">yaguven.egreso.caja</field>
         <field name="view_mode">list,form</field>
-        <field name="context">{'search_default_filtro_este_mes': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Registrá el primer egreso de caja</p>
             <p>Cada egreso debita la cuenta que elijas y acredita la caja central.</p>
