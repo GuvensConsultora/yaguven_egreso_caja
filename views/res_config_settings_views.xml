@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_res_config_settings_egreso_caja" model="ir.ui.view">
+        <field name="name">res.config.settings.egreso.caja</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='bank_cash']" position="after">
+                <block title="Egresos de caja" id="yaguven_egreso_caja"
+                       groups="yaguven_egreso_caja.group_egreso_caja_consulta">
+                    <setting string="Diario y caja central"
+                             help="Cada egreso debita la cuenta elegida y acredita esta caja central, en este diario.">
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label for="yaguven_egreso_caja_journal_id" class="col-lg-4 o_light_label"/>
+                                <field name="yaguven_egreso_caja_journal_id"/>
+                            </div>
+                            <div class="row">
+                                <label for="yaguven_egreso_caja_account_id" class="col-lg-4 o_light_label"/>
+                                <field name="yaguven_egreso_caja_account_id"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

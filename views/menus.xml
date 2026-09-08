@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_egreso_caja_raiz"
+              name="Egresos de Caja"
+              sequence="47"
+              groups="group_egreso_caja_consulta"/>
+
+    <menuitem id="menu_egreso_caja"
+              name="Egresos"
+              parent="menu_egreso_caja_raiz"
+              action="action_egreso_caja"
+              sequence="10"/>
+
+    <menuitem id="menu_egreso_caja_configuracion"
+              name="Configuración"
+              parent="menu_egreso_caja_raiz"
+              sequence="90"
+              groups="account.group_account_manager"/>
+
+    <menuitem id="menu_egreso_caja_cuenta"
+              name="Cuentas habilitadas"
+              parent="menu_egreso_caja_configuracion"
+              action="action_egreso_caja_cuenta"
+              sequence="10"/>
+
+</odoo>

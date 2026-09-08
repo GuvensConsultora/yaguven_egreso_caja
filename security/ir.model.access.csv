@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_egreso_caja_consulta,Egreso de caja - consulta,model_yaguven_egreso_caja,group_egreso_caja_consulta,1,0,0,0
+access_egreso_caja_carga,Egreso de caja - carga,model_yaguven_egreso_caja,group_egreso_caja_carga,1,1,1,0
+access_egreso_caja_contabilidad,Egreso de caja - contabilidad,model_yaguven_egreso_caja,account.group_account_manager,1,1,1,1
+access_egreso_caja_cuenta_consulta,Cuentas habilitadas - consulta,model_yaguven_egreso_caja_cuenta,group_egreso_caja_consulta,1,0,0,0
+access_egreso_caja_cuenta_contabilidad,Cuentas habilitadas - contabilidad,model_yaguven_egreso_caja_cuenta,account.group_account_manager,1,1,1,1

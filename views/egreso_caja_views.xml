@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_egreso_caja_form" model="ir.ui.view">
+        <field name="name">yaguven.egreso.caja.form</field>
+        <field name="model">yaguven.egreso.caja</field>
+        <field name="arch" type="xml">
+            <form string="Egreso de caja">
+                <header>
+                    <button name="action_confirmar" type="object" string="Confirmar"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_anular" type="object" string="Anular"
+                            invisible="state != 'posted'"
+                            confirm="Se va a revertir el asiento de este egreso. El registro queda como anulado, no se borra. ¿Seguimos?"/>
+                    <button name="action_ver_asiento" type="object" string="Ver asiento"
+                            invisible="not move_id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="cuenta_habilitada_ids" invisible="1"/>
+                            <field name="account_id"
+                                   domain="[('id', 'in', cuenta_habilitada_ids)]"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="concepto" placeholder="Para qué salió la plata"
+                               readonly="state != 'draft'"/>
+                        <field name="attachment_ids" widget="many2many_binary"
+                               readonly="state == 'cancel'"/>
+                    </group>
+                    <group string="Asientos" invisible="not move_id">
+                        <field name="move_id" readonly="1"/>
+                        <field name="reversal_move_id" readonly="1" invisible="not reversal_move_id"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_egreso_caja_list" model="ir.ui.view">
+        <field name="name">yaguven.egreso.caja.list</field>
+        <field name="model">yaguven.egreso.caja</field>
+        <field name="arch" type="xml">
+            <list string="Egresos de caja" decoration-muted="state == 'cancel'">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="account_id"/>
+                <field name="concepto"/>
+                <field name="state"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="amount" sum="Total"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_egreso_caja_search" model="ir.ui.view">
+        <field name="name">yaguven.egreso.caja.search</field>
+        <field name="model">yaguven.egreso.caja</field>
+        <field name="arch" type="xml">
+            <search string="Egresos de caja">
+                <field name="name"/>
+                <field name="concepto"/>
+                <field name="account_id"/>
+                <filter name="filtro_borrador" string="En borrador" domain="[('state', '=', 'draft')]"/>
+                <filter name="filtro_confirmado" string="Confirmados" domain="[('state', '=', 'posted')]"/>
+                <filter name="filtro_anulado" string="Anulados" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <filter name="filtro_este_mes" string="Este mes"
+                        domain="[('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="agrupar_cuenta" string="Cuenta" context="{'group_by': 'account_id'}"/>
+                    <filter name="agrupar_estado" string="Estado" context="{'group_by': 'state'}"/>
+                    <filter name="agrupar_mes" string="Mes" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_egreso_caja" model="ir.actions.act_window">
+        <field name="name">Egresos de caja</field>
+        <field name="res_model">yaguven.egreso.caja</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filtro_este_mes': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Registrá el primer egreso de caja</p>
+            <p>Cada egreso debita la cuenta que elijas y acredita la caja central.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_egreso_caja_cuenta_list" model="ir.ui.view">
+        <field name="name">yaguven.egreso.caja.cuenta.list</field>
+        <field name="model">yaguven.egreso.caja.cuenta</field>
+        <field name="arch" type="xml">
+            <list string="Cuentas habilitadas" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="account_id" options="{'no_create': True}"/>
+                <field name="nota"/>
+                <field name="active" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_egreso_caja_cuenta_search" model="ir.ui.view">
+        <field name="name">yaguven.egreso.caja.cuenta.search</field>
+        <field name="model">yaguven.egreso.caja.cuenta</field>
+        <field name="arch" type="xml">
+            <search string="Cuentas habilitadas">
+                <field name="account_id"/>
+                <filter name="filtro_inactivas" string="Inactivas" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_egreso_caja_cuenta" model="ir.actions.act_window">
+        <field name="name">Cuentas habilitadas</field>
+        <field name="res_model">yaguven.egreso.caja.cuenta</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Habilitá la primera cuenta</p>
+            <p>Estas son las únicas cuentas que aparecen al cargar un egreso de caja.
+               Mientras la lista esté vacía, no se puede elegir ninguna.</p>
+        </field>
+    </record>
+
+</odoo>

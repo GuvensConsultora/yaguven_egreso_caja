@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="privilege_egreso_caja" model="res.groups.privilege">
+        <field name="name">Egresos de caja</field>
+        <field name="sequence">47</field>
+    </record>
+
+    <record id="group_egreso_caja_consulta" model="res.groups">
+        <field name="name">Consulta egresos de caja</field>
+        <field name="privilege_id" ref="privilege_egreso_caja"/>
+        <field name="comment">Ve la pantalla de egresos de caja y su historial, sin poder cargar ni confirmar nada.</field>
+    </record>
+
+    <record id="group_egreso_caja_carga" model="res.groups">
+        <field name="name">Carga egresos de caja</field>
+        <field name="privilege_id" ref="privilege_egreso_caja"/>
+        <field name="implied_ids" eval="[(4, ref('group_egreso_caja_consulta'))]"/>
+        <field name="comment">Carga, confirma y anula egresos de caja. Quien no tenga este permiso ni el de consulta no ve la aplicación.</field>
+    </record>
+
+    <record id="egreso_caja_regla_compania" model="ir.rule">
+        <field name="name">Egresos de caja: sólo los de las compañías activas</field>
+        <field name="model_id" ref="model_yaguven_egreso_caja"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="egreso_caja_cuenta_regla_compania" model="ir.rule">
+        <field name="name">Cuentas habilitadas: sólo las de las compañías activas</field>
+        <field name="model_id" ref="model_yaguven_egreso_caja_cuenta"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+</odoo>
