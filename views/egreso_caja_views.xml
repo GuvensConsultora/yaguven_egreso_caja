@@ -82,7 +82,7 @@
                 <filter name="filtro_anulado" string="Anulados" domain="[('state', '=', 'cancel')]"/>
                 <separator/>
                 <filter name="filtro_fecha" string="Fecha" date="date"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter name="agrupar_cuenta" string="Cuenta" context="{'group_by': 'account_id'}"/>
                     <filter name="agrupar_estado" string="Estado" context="{'group_by': 'state'}"/>
                     <filter name="agrupar_mes" string="Mes" context="{'group_by': 'date:month'}"/>
