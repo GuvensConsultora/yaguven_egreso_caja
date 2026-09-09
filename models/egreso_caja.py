@@ -76,6 +76,34 @@ class YaguvenEgresoCaja(models.Model):
         tracking=True,
         help="Se escribe en el asiento y queda en el historial.",
     )
+    recibe_partner_id = fields.Many2one(
+        "res.partner",
+        string="Recibe (contacto)",
+        tracking=True,
+        help="Para empleados o proveedores que ya están cargados como contacto. "
+        "Si quien retira no está en la lista, dejarlo vacío y escribir el nombre al lado.",
+    )
+    recibe_nombre = fields.Char(
+        string="Recibe (nombre)",
+        tracking=True,
+        help="Sólo si no se eligió un contacto. Si los dos quedan vacíos, el comprobante "
+        "sale con la línea en blanco para completar a mano.",
+    )
+    recibe_documento = fields.Char(
+        string="Documento de quien recibe",
+        tracking=True,
+        help="Opcional. Si se eligió un contacto y esto queda vacío, se imprime el CUIT del contacto.",
+    )
+    receptor = fields.Char(
+        string="Quien recibe",
+        compute="_compute_receptor",
+        help="Campo técnico: es lo que se imprime en el comprobante.",
+    )
+    receptor_documento = fields.Char(
+        string="Documento impreso",
+        compute="_compute_receptor",
+        help="Campo técnico: es lo que se imprime en el comprobante.",
+    )
     attachment_ids = fields.Many2many(
         "ir.attachment",
         "yaguven_egreso_caja_attachment_rel",
@@ -110,6 +138,21 @@ class YaguvenEgresoCaja(models.Model):
     # ------------------------------------------------------------------
     # cómputos y validaciones
     # ------------------------------------------------------------------
+
+    @api.depends("recibe_partner_id", "recibe_nombre", "recibe_documento")
+    def _compute_receptor(self):
+        """Lo que se imprime: manda el contacto y el texto libre es el respaldo.
+
+        Los dos pueden quedar vacíos a propósito — el comprobante sale con la línea
+        en blanco y la persona la completa al firmar.
+        """
+        for egreso in self:
+            egreso.receptor = (
+                egreso.recibe_partner_id.name or egreso.recibe_nombre or ""
+            )
+            egreso.receptor_documento = (
+                egreso.recibe_documento or egreso.recibe_partner_id.vat or ""
+            )
 
     @api.depends("company_id")
     def _compute_cuenta_habilitada_ids(self):

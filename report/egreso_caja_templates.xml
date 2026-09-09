@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Comprobante de egreso de caja, para que lo firme quien retira los valores.
+
+        Dos copias en la misma hoja (original para la caja, duplicado para quien
+        recibe), separadas por una línea de corte. No usa `web.external_layout`
+        porque ese layout pone encabezado y pie por página, y acá hacen falta dos
+        encabezados dentro de la misma página: el bloque se arma a mano con el
+        logo y los datos de la compañía.
+    -->
+
+    <template id="report_egreso_caja_documento">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="company" t-value="o.company_id"/>
+                <div class="page" style="font-family: Arial, Helvetica, sans-serif; font-size: 11px;">
+                    <style>
+                        .ec_bloque { padding: 4mm 0 6mm 0; }
+                        .ec_corte { border-top: 1px dashed #666; margin: 2mm 0;
+                                    text-align: center; font-size: 9px; color: #666; }
+                        .ec_tabla { width: 100%; border-collapse: collapse; margin-top: 3mm; }
+                        .ec_tabla th { text-align: left; width: 32mm; padding: 1.2mm 2mm 1.2mm 0;
+                                       vertical-align: top; font-weight: bold; }
+                        .ec_tabla td { padding: 1.2mm 0; vertical-align: top;
+                                       border-bottom: 1px solid #ddd; }
+                        .ec_importe { border: 1.5px solid #000; padding: 2.5mm 3mm; margin-top: 4mm; }
+                        .ec_firma { width: 100%; margin-top: 12mm; border-collapse: collapse; }
+                        .ec_firma td { width: 50%; padding-right: 8mm; vertical-align: bottom; }
+                        .ec_linea { border-top: 1px solid #000; padding-top: 1mm; }
+                        .ec_aviso { border: 1.5px solid #000; padding: 1.5mm 3mm;
+                                    font-weight: bold; letter-spacing: 1px; }
+                    </style>
+
+                    <t t-foreach="[
+                            {'titulo': 'ORIGINAL', 'destino': 'queda en la caja'},
+                            {'titulo': 'DUPLICADO', 'destino': 'para quien recibe'}]"
+                       t-as="copia">
+                        <div class="ec_bloque">
+
+                            <!-- encabezado -->
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 60%; vertical-align: top;">
+                                        <img t-if="company.logo"
+                                             t-att-src="image_data_uri(company.logo)"
+                                             style="max-height: 42px; max-width: 60mm;"/>
+                                        <div style="font-weight: bold; margin-top: 1mm;"
+                                             t-field="company.name"/>
+                                        <div t-if="company.vat">CUIT <span t-field="company.vat"/></div>
+                                        <div t-field="company.partner_id"
+                                             t-options='{"widget": "contact",
+                                                         "fields": ["address", "phone"],
+                                                         "no_marker": true}'/>
+                                    </td>
+                                    <td style="width: 40%; vertical-align: top; text-align: right;">
+                                        <div style="font-size: 14px; font-weight: bold;">
+                                            COMPROBANTE DE EGRESO DE CAJA
+                                        </div>
+                                        <div style="margin-top: 1mm;">
+                                            <span t-esc="copia['titulo']"/> ·
+                                            <span t-esc="copia['destino']"/>
+                                        </div>
+                                        <div style="margin-top: 2mm;">
+                                            <strong>N°</strong> <span t-field="o.name"/><br/>
+                                            <strong>Fecha</strong> <span t-field="o.date"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- estado, cuando el egreso todavía no está confirmado -->
+                            <div t-if="o.state == 'draft'" class="ec_aviso" style="margin-top: 3mm;">
+                                SIN CONFIRMAR — este comprobante todavía no tiene asiento registrado
+                            </div>
+                            <div t-if="o.state == 'cancel'" class="ec_aviso" style="margin-top: 3mm;">
+                                ANULADO — el asiento de este egreso fue revertido
+                            </div>
+
+                            <!-- cuerpo -->
+                            <table class="ec_tabla">
+                                <tr>
+                                    <th>Concepto</th>
+                                    <td t-field="o.concepto"/>
+                                </tr>
+                                <tr>
+                                    <th>Se imputa a</th>
+                                    <td t-field="o.account_id"/>
+                                </tr>
+                                <tr>
+                                    <th>Sale de</th>
+                                    <td>
+                                        <span t-field="company.yaguven_egreso_caja_account_id"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="o.move_id">
+                                    <th>Asiento</th>
+                                    <td><span t-field="o.move_id.name"/></td>
+                                </tr>
+                            </table>
+
+                            <div class="ec_importe">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="font-size: 12px;">IMPORTE</td>
+                                        <td style="text-align: right; font-size: 16px; font-weight: bold;">
+                                            <span t-field="o.amount"
+                                                  t-options='{"widget": "monetary",
+                                                              "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div style="margin-top: 1mm; font-style: italic;">
+                                    <span t-esc="o.currency_id.amount_to_text(o.amount)"/>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 4mm;">
+                                Recibí conforme la suma indicada, por el concepto detallado más arriba.
+                            </div>
+
+                            <!-- firmas -->
+                            <table class="ec_firma">
+                                <tr>
+                                    <td>
+                                        <div class="ec_linea">Entregué — caja</div>
+                                        <div style="margin-top: 1mm;">Aclaración:</div>
+                                    </td>
+                                    <td>
+                                        <div class="ec_linea">Recibí conforme — firma</div>
+                                        <div style="margin-top: 1mm;">
+                                            Aclaración: <span t-esc="o.receptor or ''"/>
+                                        </div>
+                                        <div>
+                                            Documento: <span t-esc="o.receptor_documento or ''"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+                        <div t-if="copia_first" class="ec_corte">
+                            — — — — — — — — — — cortar por aquí — — — — — — — — — —
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

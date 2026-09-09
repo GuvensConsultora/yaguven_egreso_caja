@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        La acción queda vinculada al modelo (`binding_model_id`), así el comprobante
+        aparece solo en el menú «Imprimir» del formulario y de la lista, sin que haya
+        que agregar un botón a mano.
+
+        Se puede imprimir en cualquier estado a propósito: el papel se firma al
+        entregar la plata y el egreso se confirma después. El propio PDF avisa
+        «SIN CONFIRMAR» mientras no tenga asiento.
+    -->
+
+    <record id="action_report_egreso_caja" model="ir.actions.report">
+        <field name="name">Comprobante para firmar</field>
+        <field name="model">yaguven.egreso.caja</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">yaguven_egreso_caja.report_egreso_caja_documento</field>
+        <field name="report_file">yaguven_egreso_caja.report_egreso_caja_documento</field>
+        <field name="print_report_name">
+            'Egreso de caja %s' % ((object.name or '').replace('/', '-'))
+        </field>
+        <field name="binding_model_id" ref="model_yaguven_egreso_caja"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

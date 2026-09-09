@@ -4,6 +4,7 @@
     <menuitem id="menu_egreso_caja_raiz"
               name="Egresos de Caja"
               sequence="47"
+              web_icon="yaguven_egreso_caja,static/description/icon.png"
               groups="group_egreso_caja_consulta"/>
 
     <menuitem id="menu_egreso_caja"

@@ -42,6 +42,27 @@
                         <field name="attachment_ids" widget="many2many_binary"
                                readonly="state == 'cancel'"/>
                     </group>
+                    <group string="Quien recibe" invisible="state == 'cancel'">
+                        <group>
+                            <field name="recibe_partner_id"
+                                   options="{'no_create_edit': True}"
+                                   readonly="state != 'draft'"
+                                   placeholder="Si está cargado como contacto"/>
+                            <field name="recibe_nombre"
+                                   readonly="state != 'draft'"
+                                   invisible="recibe_partner_id"
+                                   placeholder="Nombre, si no es un contacto"/>
+                        </group>
+                        <group>
+                            <field name="recibe_documento"
+                                   readonly="state != 'draft'"
+                                   placeholder="DNI o CUIT de quien firma"/>
+                        </group>
+                        <div colspan="2" class="text-muted">
+                            Se imprime en el comprobante que firma quien recibe los valores.
+                            Se puede dejar vacío y completarlo a mano sobre el papel.
+                        </div>
+                    </group>
                     <group string="Asientos" invisible="not move_id">
                         <field name="move_id" readonly="1"/>
                         <field name="reversal_move_id" readonly="1" invisible="not reversal_move_id"/>
@@ -61,6 +82,7 @@
                 <field name="name"/>
                 <field name="account_id"/>
                 <field name="concepto"/>
+                <field name="receptor" string="Recibe" optional="hide"/>
                 <field name="state"/>
                 <field name="currency_id" column_invisible="True"/>
                 <field name="amount" sum="Total"/>
@@ -77,6 +99,8 @@
                 <field name="name"/>
                 <field name="concepto"/>
                 <field name="account_id"/>
+                <field name="recibe_partner_id"/>
+                <field name="recibe_nombre"/>
                 <filter name="filtro_borrador" string="En borrador" domain="[('state', '=', 'draft')]"/>
                 <filter name="filtro_confirmado" string="Confirmados" domain="[('state', '=', 'posted')]"/>
                 <filter name="filtro_anulado" string="Anulados" domain="[('state', '=', 'cancel')]"/>
