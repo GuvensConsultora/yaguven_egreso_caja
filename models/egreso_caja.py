@@ -1,5 +1,10 @@
 from markupsafe import Markup
 
+try:                                   # Odoo lo trae, pero no rompemos si falta
+    from num2words import num2words
+except ImportError:
+    num2words = None
+
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import formatLang
@@ -138,6 +143,24 @@ class YaguvenEgresoCaja(models.Model):
     # ------------------------------------------------------------------
     # cómputos y validaciones
     # ------------------------------------------------------------------
+
+    def importe_en_letras(self):
+        """El importe escrito, para el comprobante que se firma.
+
+        `currency_id.amount_to_text()` devuelve «Cuarenta Y Cinco Mil Peso»
+        —capitalizado palabra por palabra y la moneda en singular—, que en un
+        papel que alguien firma queda mal. Acá sale «Son pesos cuarenta y cinco
+        mil con 00/100», que es la forma usual del recibo.
+        """
+        self.ensure_one()
+        entero = int(abs(self.amount))
+        centavos = int(round((abs(self.amount) - entero) * 100))
+        if num2words is None:
+            return self.currency_id.amount_to_text(self.amount)
+        moneda = (self.currency_id.currency_unit_label or "pesos").lower()
+        if not moneda.endswith("s"):
+            moneda += "s"
+        return "Son %s %s con %02d/100" % (moneda, num2words(entero, lang="es"), centavos)
 
     @api.depends("recibe_partner_id", "recibe_nombre", "recibe_documento")
     def _compute_receptor(self):

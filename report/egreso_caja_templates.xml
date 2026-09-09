@@ -10,6 +10,11 @@
         encabezados dentro de la misma página: el bloque se arma a mano con el
         logo y los datos de la compañía.
 
+        El `<div class="article">` NO es decorativo: sin él, Odoo arma el HTML que
+        le pasa a wkhtmltopdf sin el `<head>`, wkhtmltopdf asume latin-1 y todos los
+        acentos del PDF salen rotos (ñ → Ã±). El HTML se ve perfecto; sólo el PDF
+        sale mal. Medido contra un reporte nativo, que sí lo lleva.
+
         Ojo al editar: `t-field` NO puede ir sobre `table`, `tr`, `td` ni `th` —
         QWeb corta con «QWeb widgets do not work correctly on 'td' elements».
         Dentro de una celda siempre va envuelto en un `<span>`.
@@ -19,6 +24,10 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="company" t-value="o.company_id"/>
+                <div class="article"
+                     t-att-data-oe-model="o and o._name"
+                     t-att-data-oe-id="o and o.id"
+                     t-att-data-oe-lang="o and o.env.context.get('lang')">
                 <div class="page" style="font-family: Arial, Helvetica, sans-serif; font-size: 11px;">
                     <style>
                         .ec_bloque { padding: 4mm 0 6mm 0; }
@@ -116,7 +125,7 @@
                                     </tr>
                                 </table>
                                 <div style="margin-top: 1mm; font-style: italic;">
-                                    <span t-esc="o.currency_id.amount_to_text(o.amount)"/>
+                                    <span t-esc="o.importe_en_letras()"/>
                                 </div>
                             </div>
 
@@ -148,6 +157,7 @@
                             — — — — — — — — — — cortar por aquí — — — — — — — — — —
                         </div>
                     </t>
+                </div>
                 </div>
             </t>
         </t>
