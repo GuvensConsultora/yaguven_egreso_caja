@@ -9,6 +9,10 @@
         porque ese layout pone encabezado y pie por página, y acá hacen falta dos
         encabezados dentro de la misma página: el bloque se arma a mano con el
         logo y los datos de la compañía.
+
+        Ojo al editar: `t-field` NO puede ir sobre `table`, `tr`, `td` ni `th` —
+        QWeb corta con «QWeb widgets do not work correctly on 'td' elements».
+        Dentro de una celda siempre va envuelto en un `<span>`.
     -->
 
     <template id="report_egreso_caja_documento">
@@ -82,11 +86,11 @@
                             <table class="ec_tabla">
                                 <tr>
                                     <th>Concepto</th>
-                                    <td t-field="o.concepto"/>
+                                    <td><span t-field="o.concepto"/></td>
                                 </tr>
                                 <tr>
                                     <th>Se imputa a</th>
-                                    <td t-field="o.account_id"/>
+                                    <td><span t-field="o.account_id"/></td>
                                 </tr>
                                 <tr>
                                     <th>Sale de</th>
