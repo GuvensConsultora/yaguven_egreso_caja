@@ -22,12 +22,32 @@
                     </div>
                     <group>
                         <group>
+                            <field name="tipo" widget="radio" readonly="state != 'draft'"/>
                             <field name="date" readonly="state != 'draft'"/>
                             <field name="cuenta_habilitada_ids" invisible="1"/>
+                            <field name="credito_disponible_ids" invisible="1"/>
                             <field name="account_id"
                                    domain="[('id', 'in', cuenta_habilitada_ids)]"
                                    options="{'no_create': True, 'no_open': True}"
-                                   readonly="state != 'draft'"/>
+                                   readonly="state != 'draft'"
+                                   required="tipo == 'gasto'"
+                                   invisible="tipo != 'gasto'"/>
+                            <field name="cliente_id"
+                                   options="{'no_create_edit': True}"
+                                   readonly="state != 'draft'"
+                                   required="tipo == 'devolucion'"
+                                   invisible="tipo != 'devolucion'"/>
+                            <field name="credito_disponible"
+                                   invisible="tipo != 'devolucion' or not cliente_id"/>
+                            <field name="credito_line_id"
+                                   string="Saldo a favor a devolver"
+                                   domain="[('id', 'in', credito_disponible_ids)]"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="state != 'draft'"
+                                   required="tipo == 'devolucion'"
+                                   invisible="tipo != 'devolucion'"/>
+                            <field name="credito_residual"
+                                   invisible="tipo != 'devolucion' or not credito_line_id"/>
                         </group>
                         <group>
                             <field name="currency_id" invisible="1"/>
@@ -36,6 +56,12 @@
                                    readonly="state != 'draft'"/>
                         </group>
                     </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="tipo != 'devolucion' or not cliente_id or credito_disponible > 0">
+                        Este cliente no tiene ningún saldo a favor, así que no hay nada que
+                        devolverle. Si devolvió mercadería, primero hay que hacer la nota de
+                        crédito: ese crédito es el que después se devuelve por acá.
+                    </div>
                     <group>
                         <field name="concepto" placeholder="Para qué salió la plata"
                                readonly="state != 'draft'"/>
@@ -64,6 +90,7 @@
                         </div>
                     </group>
                     <group string="Asientos" invisible="not move_id">
+                        <field name="payment_id" readonly="1" invisible="not payment_id"/>
                         <field name="move_id" readonly="1"/>
                         <field name="reversal_move_id" readonly="1" invisible="not reversal_move_id"/>
                     </group>
@@ -80,7 +107,9 @@
             <list string="Egresos de caja" decoration-muted="state == 'cancel'">
                 <field name="date"/>
                 <field name="name"/>
+                <field name="tipo"/>
                 <field name="account_id"/>
+                <field name="cliente_id" optional="show"/>
                 <field name="concepto"/>
                 <field name="receptor" string="Recibe" optional="hide"/>
                 <field name="state"/>
@@ -99,14 +128,19 @@
                 <field name="name"/>
                 <field name="concepto"/>
                 <field name="account_id"/>
+                <field name="cliente_id"/>
                 <field name="recibe_partner_id"/>
                 <field name="recibe_nombre"/>
+                <filter name="filtro_gastos" string="Gastos de caja" domain="[('tipo', '=', 'gasto')]"/>
+                <filter name="filtro_devoluciones" string="Devoluciones" domain="[('tipo', '=', 'devolucion')]"/>
+                <separator/>
                 <filter name="filtro_borrador" string="En borrador" domain="[('state', '=', 'draft')]"/>
                 <filter name="filtro_confirmado" string="Confirmados" domain="[('state', '=', 'posted')]"/>
                 <filter name="filtro_anulado" string="Anulados" domain="[('state', '=', 'cancel')]"/>
                 <separator/>
                 <filter name="filtro_fecha" string="Fecha" date="date"/>
                 <group>
+                    <filter name="agrupar_tipo" string="Tipo" context="{'group_by': 'tipo'}"/>
                     <filter name="agrupar_cuenta" string="Cuenta" context="{'group_by': 'account_id'}"/>
                     <filter name="agrupar_estado" string="Estado" context="{'group_by': 'state'}"/>
                     <filter name="agrupar_mes" string="Mes" context="{'group_by': 'date:month'}"/>

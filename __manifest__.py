@@ -20,6 +20,21 @@ desinstalación no deja rastros.
 Un egreso confirmado no se borra: se **anula**, lo que revierte el asiento y deja
 el registro y su historial a la vista.
 
+Devoluciones de dinero a clientes
+---------------------------------
+
+La misma pantalla registra la **devolución de dinero a un cliente**: se elige el
+cliente y **cuál de sus saldos a favor** se le devuelve, y el sistema registra un
+pago de salida por la caja del cajero y lo aplica contra ese saldo, con lo que la
+cuenta del cliente queda saldada.
+
+No se puede devolver a un cliente que no tenga saldo a favor: si devolvió
+mercadería, primero va la **nota de crédito** —que la autoriza quien
+corresponda— y ese crédito es el que después se devuelve por acá. Así el dinero
+nunca sale de la caja sin un respaldo previo.
+
+Cada devolución confirmada **notifica** a quienes la compañía tenga configurados.
+
 Comprobante para firmar
 -----------------------
 
@@ -52,7 +67,7 @@ las administra contabilidad, no quien carga.
     "author": "Yagüven C.G.",
     "website": "https://yaguven.com",
     "category": "Accounting/Accounting",
-    "version": "19.0.2.1.0",
+    "version": "19.0.3.0.0",
     "license": "LGPL-3",
     "depends": ["account", "mail"],
     "data": [

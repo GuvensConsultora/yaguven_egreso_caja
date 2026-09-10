@@ -69,7 +69,8 @@
                                     </td>
                                     <td style="width: 40%; vertical-align: top; text-align: right;">
                                         <div style="font-size: 14px; font-weight: bold;">
-                                            COMPROBANTE DE EGRESO DE CAJA
+                                            <span t-if="o.tipo == 'devolucion'">COMPROBANTE DE DEVOLUCIÓN DE DINERO</span>
+                                            <span t-else="">COMPROBANTE DE EGRESO DE CAJA</span>
                                         </div>
                                         <div style="margin-top: 1mm;">
                                             <span t-esc="copia['titulo']"/> ·
@@ -97,15 +98,30 @@
                                     <th>Concepto</th>
                                     <td><span t-field="o.concepto"/></td>
                                 </tr>
-                                <tr>
+                                <tr t-if="o.tipo == 'gasto'">
                                     <th>Se imputa a</th>
                                     <td><span t-field="o.account_id"/></td>
+                                </tr>
+                                <tr t-if="o.tipo == 'devolucion'">
+                                    <th>Cliente</th>
+                                    <td><span t-field="o.cliente_id"/></td>
+                                </tr>
+                                <tr t-if="o.tipo == 'devolucion' and o.credito_line_id">
+                                    <th>Devolución de</th>
+                                    <td><span t-field="o.credito_line_id.move_id.name"/></td>
                                 </tr>
                                 <tr>
                                     <th>Sale de</th>
                                     <td>
-                                        <span t-field="company.yaguven_egreso_caja_account_id"/>
+                                        <span t-if="o.tipo == 'devolucion'"
+                                              t-field="company.yaguven_devolucion_journal_id"/>
+                                        <span t-else=""
+                                              t-field="company.yaguven_egreso_caja_account_id"/>
                                     </td>
+                                </tr>
+                                <tr t-if="o.tipo == 'devolucion' and o.payment_id">
+                                    <th>Pago</th>
+                                    <td><span t-field="o.payment_id.name"/></td>
                                 </tr>
                                 <tr t-if="o.move_id">
                                     <th>Asiento</th>
@@ -130,7 +146,8 @@
                             </div>
 
                             <div style="margin-top: 4mm;">
-                                Recibí conforme la suma indicada, por el concepto detallado más arriba.
+                                <span t-if="o.tipo == 'devolucion'">Recibí conforme la devolución de la suma indicada.</span>
+                                <span t-else="">Recibí conforme la suma indicada, por el concepto detallado más arriba.</span>
                             </div>
 
                             <!-- firmas -->
