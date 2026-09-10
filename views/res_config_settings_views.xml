@@ -22,21 +22,6 @@
                             </div>
                         </div>
                     </setting>
-                    <setting string="Devoluciones de dinero a clientes"
-                             help="Caja por la que sale el dinero y a quiénes se les avisa cada devolución.">
-                        <div class="content-group">
-                            <div class="row mt16">
-                                <label for="yaguven_devolucion_journal_id" class="col-lg-4 o_light_label"/>
-                                <field name="yaguven_devolucion_journal_id"/>
-                            </div>
-                            <div class="row">
-                                <label for="yaguven_egreso_caja_aviso_partner_ids" class="col-lg-4 o_light_label"/>
-                                <field name="yaguven_egreso_caja_aviso_partner_ids"
-                                       widget="many2many_tags"
-                                       options="{'no_create': True}"/>
-                            </div>
-                        </div>
-                    </setting>
                 </block>
             </xpath>
         </field>
