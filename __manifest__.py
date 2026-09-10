@@ -67,7 +67,7 @@ las administra contabilidad, no quien carga.
     "author": "Yagüven C.G.",
     "website": "https://yaguven.com",
     "category": "Accounting/Accounting",
-    "version": "19.0.3.0.0",
+    "version": "19.0.3.0.1",
     "license": "LGPL-3",
     "depends": ["account", "mail"],
     "data": [

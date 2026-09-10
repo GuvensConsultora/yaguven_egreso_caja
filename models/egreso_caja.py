@@ -471,16 +471,26 @@ class YaguvenEgresoCaja(models.Model):
         self._informar_a_los_avisados(pago)
 
     def _anular_devolucion(self):
-        """Desaplica la devolución y cancela el pago: el crédito vuelve a estar."""
+        """Desaplica la devolución y cancela el pago: el crédito vuelve a estar.
+
+        El vínculo `move_id` se suelta ANTES de cancelar: al volver el pago a
+        borrador Odoo rehace su asiento, y con la referencia puesta el `restrict`
+        del campo lo frena («Another model is using the record you are trying to
+        delete»). El número del asiento queda en el historial, que es donde hay
+        que buscarlo después.
+        """
         self.ensure_one()
         pago = self.payment_id.sudo()
-        if pago.state == "paid" or pago.state == "in_process":
+        nombre_asiento = self.move_id.sudo().display_name or pago.display_name
+        self.write({"move_id": False, "state": "cancel"})
+        if pago.state in ("paid", "in_process"):
             pago.move_id.line_ids.remove_move_reconcile()
             pago.action_draft()
             pago.action_cancel()
-        self.write({"state": "cancel"})
-        self._avisar_en_el_historial(titulo=_("Devolución anulada"),
-                                     asiento=pago.move_id)
+        self._avisar_en_el_historial_texto(
+            titulo=_("Devolución anulada"),
+            detalle_asiento=nombre_asiento,
+        )
 
     def _metodo_de_salida(self, diario):
         """Método de pago que saca el dinero de la caja en el acto.
@@ -598,6 +608,27 @@ class YaguvenEgresoCaja(models.Model):
                 ),
             ],
         }
+
+    def _avisar_en_el_historial_texto(self, titulo, detalle_asiento):
+        """Igual que `_avisar_en_el_historial`, con el asiento ya resuelto a texto.
+
+        Hace falta cuando el asiento dejó de estar vinculado (una devolución
+        anulada suelta `move_id` antes de cancelar el pago).
+        """
+        self.ensure_one()
+        cuerpo = (
+            "<p><strong>%s</strong></p><p>Asiento: %s<br/>Importe: %s</p>"
+        ) % (
+            html_escape(titulo),
+            html_escape(detalle_asiento or ""),
+            html_escape(formatLang(self.env, self.amount, currency_obj=self.currency_id)),
+        )
+        self.message_post(
+            body=Markup(cuerpo),
+            subject=titulo,
+            message_type="comment",
+            subtype_xmlid="mail.mt_note",
+        )
 
     def _avisar_en_el_historial(self, titulo, asiento):
         self.ensure_one()
